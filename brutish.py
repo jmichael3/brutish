@@ -26,6 +26,26 @@ def read_f(dic):
 
 if __name__=="__main__":
     # do the things
+    
+    usage = \
+'''
+    #######################################
+    #           brutish.py                #
+    #######################################
+
+        Usage : ./{} [options] [wordlist]
+
+-o, --output    ...specify filename to write mangled wordlist to
+-c, --combine   ...call the combine func (combine all the words in your wordlist together)
+
+'''.format(sys.argv[0])
+
+    if len(sys.argv) < 2:
+        print(usage)
+        sys.exit()
+    else:
+        # wordlist is set to last positional arg
+        wordlist = sys.argv[-1]
 
     # take a positional arg (wordlist)
 
