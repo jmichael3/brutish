@@ -2,57 +2,82 @@
 
 import logging
 import string
+import argparse
+import sys
 
-def generate_dates_long(someword,startdate=1600,enddate=2019):
+
+def generate_nums(someword, startnum=0, endnum=2019):
+    '''takes a word and an optional startnum and endnum ...returns a list of words with the numbers appended to the end ...default (startnum=0,endnum=2019)'''
     mangle_l = []
-    for _ in range(startdate,enddate):
+    for _ in range(startnum, endnum):
         mangle_l.append(someword + str(_))
     return mangle_l
 
-def generate_dates_short(someword):
-    mangle = ""
-    return mangle
 
-def combine(w1,w2):
-    return (w1 + w2)
+def combine(w1, w2):
+    '''takes word1 and word2 and returns a string of w1+w2'''
+    return (str(w1) + str(w2))
 
-def add_punctuation(someword):
-    for _ in add_punctuation
+
+def add_punctuation(someword, aggressive=False):
+    '''takes someword and an opptional arg, aggressive which is set to False by default...returns a list of words with punctuation at the end'''
+    if aggressive == False:
+        return [someword + "!"]
+    else:
+        [someword + _ for _ in string.punctuation]
+
 
 def read_f(dic):
-    with open(dic,"r") as f:
+    '''takes a textfile and just returns an f.read() '''
+    with open(dic, "r") as f:
         return f.read()
 
 
-if __name__=="__main__":
-    # do the things
-    
-    usage = \
-'''
-    #######################################
-    #           brutish.py                #
-    #######################################
+if __name__ == "__main__":
+    # initialize some schtuff
 
-        Usage : ./{} [options] [wordlist]
+    wordlist = []
+    DATA = ""
+    LOG_FORMAT = "%(levelname)s %(asctime)s - %(message)s"
+    logging.basicConfig(filename=".brutish_log",
+                        level=logging.DEBUG, format=LOG_FORMAT, filemode="w")
+    logger = logging.getLogger()
+    print("[*]Logging at level {}".format(logger.level))
+    logger.info("[*]Logging at level {}".format(logger.level))
 
--o, --output    ...specify filename to write mangled wordlist to
--c, --combine   ...call the combine func (combine all the words in your wordlist together)
-
-'''.format(sys.argv[0])
-
-    if len(sys.argv) < 2:
-        print(usage)
+    if len(sys.argv) != 2:
+        print("[*]Usage : {} wordlist".format(sys.argv[0]))
         sys.exit()
-    else:
-        # wordlist is set to last positional arg
-        wordlist = sys.argv[-1]
 
-    # take a positional arg (wordlist)
+    # dictionary is set to last positional arg
+    logger.debug("dictionary is set to last positional arg")
+    dictionary = sys.argv[-1]
+    print("[*]Using dictionary : {}".format(dictionary))
+    logger.info("dictionary = {} ".format(dictionary))
 
-    # if the wordlist is the only thing provided then do all the things
+    # read dictionary and create wordlist
+    logger.debug("read dictionary and create wordlist")
+    w = read_f(dictionary)
+    wordlist = w.split("\n")
+    for _ in wordlist:
+        if _ == "\n":
+            wordlist.remove("\n")
 
-    # provide an option parser for each specific function
+    # generate_nums
+    logger.debug("generate_nums")
+    for _ in wordlist.copy():
+        wordlist = wordlist + (generate_nums(_))
 
-    # if someone provides x number of options then do all x
+    # add_punctuation
+    logger.debug("add_punctuation")
+    for _ in wordlist.copy():
+        wordlist = wordlist + add_punctuation(_)
 
-    # ignore any repeat arguments
+    # convert wordlist to \n separated string
+    logger.debug("convert wordlist to \\n separated string")
+    DATA = "\n".join(wordlist)
+
+    # write data to file
+    logger.debug("write data to file")
+    with open("brutish.dic", "a+") as f:
+        f.write(DATA)
