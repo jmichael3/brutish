@@ -4,6 +4,7 @@ import logging
 import string
 import argparse
 import sys
+import os
 
 
 def generate_nums(someword, startnum=0, endnum=2019):
@@ -33,6 +34,35 @@ def read_f(dic):
         return f.read()
 
 
+def toggle_caps(word):
+    if word[0].isalpha():
+        return (str(word[0].swapcase()) + str(word[1:]))
+    else:
+        pass
+
+
+def cleanup():
+    global wordlist
+
+    # do some cleanup of the final wordlist
+    logger.debug("do some cleanup of the final wordlist")
+
+    for _ in wordlist.copy():
+        if _ == "\n":
+            wordlist.remove(_)
+
+        if _ is None:
+            wordlist.remove(_)
+
+        if _ == " ":
+            wordlist.remove(_)
+
+        if len(_) <= 1:
+            wordlist.remove(_)
+
+    return
+
+
 if __name__ == "__main__":
     # initialize some schtuff
 
@@ -59,19 +89,29 @@ if __name__ == "__main__":
     logger.debug("read dictionary and create wordlist")
     w = read_f(dictionary)
     wordlist = w.split("\n")
-    for _ in wordlist:
-        if _ == "\n":
-            wordlist.remove("\n")
+
+    cleanup()
 
     # generate_nums
     logger.debug("generate_nums")
     for _ in wordlist.copy():
         wordlist = wordlist + (generate_nums(_))
 
+    cleanup()
+
     # add_punctuation
     logger.debug("add_punctuation")
     for _ in wordlist.copy():
         wordlist = wordlist + add_punctuation(_)
+
+    cleanup()
+
+    # toggle first letter capitalized
+    logger.debug("toggle first letter capitalized")
+    for _ in wordlist.copy():
+        wordlist.append(toggle_caps(_))
+
+    cleanup()
 
     # convert wordlist to \n separated string
     logger.debug("convert wordlist to \\n separated string")
@@ -81,3 +121,7 @@ if __name__ == "__main__":
     logger.debug("write data to file")
     with open("brutish.dic", "a+") as f:
         f.write(DATA)
+
+    # use system commands to sort and uniq
+    logger.debug("use system commands to sort and uniq")
+    os.system("cat {} | sort | uniq > su_brutish.dic".format("brutish.dic"))
